@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF Company Autofill</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>PDF Company Autofill</h1>
+      <p class="subtitle">
+        Upload your Excel + PDF template, then click one company button to download only that PDF.
+      </p>
+      <p class="subtitle">
+        Defaults are tuned for: General letter COOP 2026- IAU.pdf
+      </p>
+
+      <form id="processForm" class="card">
+        <label>
+          Your Name
+          <input type="text" name="userName" required />
+        </label>
+
+        <label>
+          Your ID
+          <input type="text" name="userId" required />
+        </label>
+
+        <label>
+          Excel File (company names in English/Arabic columns)
+          <input type="file" name="excelFile" accept=".xlsx,.xls" required />
+        </label>
+
+        <label>
+          PDF Template
+          <input type="file" name="pdfTemplate" accept=".pdf" required />
+        </label>
+
+        <div class="grid">
+          <label>Company EN X <input type="number" name="companyEnX" value="130" required /></label>
+          <label>Company EN Y <input type="number" name="companyEnY" value="706" required /></label>
+          <label>Company AR X <input type="number" name="companyArX" value="520" required /></label>
+          <label>Company AR Y <input type="number" name="companyArY" value="640" required /></label>
+          <label>Name X <input type="number" name="nameX" value="100" required /></label>
+          <label>Name Y <input type="number" name="nameY" value="470" required /></label>
+          <label>ID X <input type="number" name="idX" value="100" required /></label>
+          <label>ID Y <input type="number" name="idY" value="440" required /></label>
+          <label>Page Number <input type="number" name="pageNumber" value="1" min="1" required /></label>
+          <label>Font Size <input type="number" name="fontSize" value="12" min="1" required /></label>
+        </div>
+
+        <button id="submitButton" type="submit">Generate Company PDFs</button>
+      </form>
+
+      <section id="results" class="card hidden">
+        <h2>Companies</h2>
+        <p class="subtitle">
+          Tap any company name to download only that company PDF.
+        </p>
+        <div id="companyButtons" class="button-list"></div>
+      </section>
+
+      <p id="status"></p>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

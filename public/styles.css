@@ -130,6 +130,43 @@ button {
   color: #111827;
 }
 
+.custom-company-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 14px 0 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.custom-company-label {
+  display: block;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.custom-company-input {
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-family: inherit;
+}
+
+.custom-company-button {
+  align-self: flex-start;
+  background: #f59e0b;
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 20px;
+}
+
+.custom-company-button:hover {
+  background: #d97706;
+}
+
 .letter-preview-label {
   margin: 16px 0 8px;
   font-size: 13px;

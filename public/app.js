@@ -6,6 +6,8 @@ const companyButtons = document.getElementById("companyButtons");
 const letterCompanyButtons = document.getElementById("letterCompanyButtons");
 const letterTemplate = document.getElementById("letterTemplate");
 const letterOutput = document.getElementById("letterOutput");
+const customCompanyInput = document.getElementById("customCompanyInput");
+const customCompanyChange = document.getElementById("customCompanyChange");
 
 function setStatus(message, isError = false) {
   statusEl.textContent = message;
@@ -120,6 +122,16 @@ function buildLetterPreview(template, companyName) {
   return t;
 }
 
+customCompanyChange.addEventListener("click", () => {
+  const name = String(customCompanyInput.value || "").trim();
+  if (!name) {
+    setStatus("Enter a company name first, then press Change.", true);
+    return;
+  }
+  letterOutput.value = buildLetterPreview(letterTemplate.value, name);
+  setStatus(`Letter preview updated with “${name}” (other company).`);
+});
+
 function renderLetterPreviewButtons(items) {
   letterCompanyButtons.innerHTML = "";
 
@@ -144,6 +156,7 @@ form.addEventListener("submit", async (event) => {
   companyButtons.innerHTML = "";
   letterCompanyButtons.innerHTML = "";
   letterOutput.value = "";
+  customCompanyInput.value = "";
 
   try {
     const formData = new FormData(form);

@@ -113,6 +113,21 @@
             <textarea id="letterOutput" class="letter-textarea letter-output" rows="14" readonly></textarea>
           </div>
         </div>
+        <div class="custom-company-box">
+          <label class="custom-company-label">
+            Other company (not in the list)
+            <input
+              type="text"
+              id="customCompanyInput"
+              class="custom-company-input"
+              placeholder="Type a company name, then press Change"
+              autocomplete="off"
+            />
+          </label>
+          <button type="button" id="customCompanyChange" class="custom-company-button">
+            Change
+          </button>
+        </div>
         <p class="subtitle letter-preview-label">Pick a company for the letter preview (download is still the row above)</p>
         <div id="letterCompanyButtons" class="button-list letter-preview-buttons"></div>
       </section>

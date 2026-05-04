@@ -89,16 +89,18 @@
           <div class="letter-col">
             <h3 class="letter-section-title">Your text</h3>
             <p class="subtitle letter-hint">
-              Use spaced labels inside brackets (spacing is optional). Examples:
+              Spacing inside brackets is optional. Examples:
               <code>[ Name ]</code>, <code>[ Id ]</code>, <code>[ Major ]</code>, <code>[ University ]</code>,
-              <code>[ Weeks ]</code>, <code>[ Date ]</code>, <code>[ Company ]</code>. Letter casing does not matter.
-              Any other single <code>[ … ]</code> left after that is filled with the company you pick below.
+              <code>[ Weeks ]</code> or <code>[ Number ]</code> (weeks), <code>[ Date ]</code> (full date),
+              <code>[ Month/Date ]</code> (e.g. May/4/2026), <code>[ Company ]</code> or
+              <code>[ Company Name ]</code>. Casing does not matter. Any other single <code>[ … ]</code> left is
+              filled with the company you pick below.
             </p>
             <textarea
               id="letterTemplate"
               class="letter-textarea"
               rows="14"
-              placeholder="Example: Dear [ Company ], I am [ Name ] ([ Id ]) studying [ Major ]…"
+              placeholder="Example: Dear [ Company Name ], [ Number ] weeks from [ Month/Date ]…"
             ></textarea>
           </div>
           <div class="letter-col">

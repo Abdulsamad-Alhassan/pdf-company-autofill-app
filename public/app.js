@@ -43,10 +43,52 @@ function formatCoopDate(raw) {
   });
 }
 
-/** Inner label after trim, lowercased — matches [ Name ], [name], [  MAJOR  ], etc. */
-const KNOWN_BRACKET_KEYS = new Set(["name", "id", "major", "university", "weeks", "date", "company"]);
+/** For [ Month / Date ] style: e.g. May/4/2026 from the date picker */
+function formatMonthSlashDate(raw) {
+  if (!raw) return "";
+  const d = new Date(`${raw}T12:00:00`);
+  if (Number.isNaN(d.getTime())) return raw;
+  const month = d.toLocaleString(undefined, { month: "long" });
+  const day = d.getDate();
+  const year = d.getFullYear();
+  return `${month}/${day}/${year}`;
+}
 
-function valueForBracketKey(key, companyName) {
+function normalizeBracketInner(inner) {
+  return String(inner)
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .replace(/\s*\/\s*/g, "/");
+}
+
+/** Map user-facing labels to internal field keys */
+function canonicalBracketKey(normalizedInner) {
+  switch (normalizedInner) {
+    case "number":
+      return "weeks";
+    case "company name":
+    case "companyname":
+      return "company";
+    case "month/date":
+      return "monthdate";
+    default:
+      return normalizedInner;
+  }
+}
+
+const KNOWN_BRACKET_KEYS = new Set([
+  "name",
+  "id",
+  "major",
+  "university",
+  "weeks",
+  "date",
+  "company",
+  "monthdate",
+]);
+
+function valueForCanonicalKey(key, companyName) {
   switch (key) {
     case "name":
       return getTrimmed("userName");
@@ -60,6 +102,8 @@ function valueForBracketKey(key, companyName) {
       return getTrimmed("weeks");
     case "date":
       return formatCoopDate(getTrimmed("coopDate"));
+    case "monthdate":
+      return formatMonthSlashDate(getTrimmed("coopDate"));
     case "company":
       return companyName;
     default:
@@ -71,11 +115,12 @@ function buildLetterPreview(template, companyName) {
   const bracketRe = /\[\s*([^\]]*?)\s*\]/g;
 
   let t = template.replace(bracketRe, (full, inner) => {
-    const key = String(inner).trim().toLowerCase();
+    const normalized = normalizeBracketInner(inner);
+    const key = canonicalBracketKey(normalized);
     if (!KNOWN_BRACKET_KEYS.has(key)) {
       return full;
     }
-    return valueForBracketKey(key, companyName);
+    return valueForCanonicalKey(key, companyName);
   });
 
   if (/\[\s*[^\]]+\s*\]/.test(t)) {

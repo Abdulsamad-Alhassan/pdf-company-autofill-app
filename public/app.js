@@ -43,18 +43,45 @@ function formatCoopDate(raw) {
   });
 }
 
-function buildLetterPreview(template, companyName) {
-  let t = template;
-  t = t.replace(/\[name\]/gi, getTrimmed("userName"));
-  t = t.replace(/\[id\]/gi, getTrimmed("userId"));
-  t = t.replace(/\[major\]/gi, getTrimmed("major"));
-  t = t.replace(/\[university\]/gi, getTrimmed("university"));
-  t = t.replace(/\[weeks\]/gi, getTrimmed("weeks"));
-  t = t.replace(/\[date\]/gi, formatCoopDate(getTrimmed("coopDate")));
-  t = t.replace(/\[company\]/gi, companyName);
-  if (/\[[^\]]+\]/.test(t)) {
-    t = t.replace(/\[[^\]]+\]/, companyName);
+/** Inner label after trim, lowercased — matches [ Name ], [name], [  MAJOR  ], etc. */
+const KNOWN_BRACKET_KEYS = new Set(["name", "id", "major", "university", "weeks", "date", "company"]);
+
+function valueForBracketKey(key, companyName) {
+  switch (key) {
+    case "name":
+      return getTrimmed("userName");
+    case "id":
+      return getTrimmed("userId");
+    case "major":
+      return getTrimmed("major");
+    case "university":
+      return getTrimmed("university");
+    case "weeks":
+      return getTrimmed("weeks");
+    case "date":
+      return formatCoopDate(getTrimmed("coopDate"));
+    case "company":
+      return companyName;
+    default:
+      return null;
   }
+}
+
+function buildLetterPreview(template, companyName) {
+  const bracketRe = /\[\s*([^\]]*?)\s*\]/g;
+
+  let t = template.replace(bracketRe, (full, inner) => {
+    const key = String(inner).trim().toLowerCase();
+    if (!KNOWN_BRACKET_KEYS.has(key)) {
+      return full;
+    }
+    return valueForBracketKey(key, companyName);
+  });
+
+  if (/\[\s*[^\]]+\s*\]/.test(t)) {
+    t = t.replace(/\[\s*[^\]]+\s*\]/, companyName);
+  }
+
   return t;
 }
 

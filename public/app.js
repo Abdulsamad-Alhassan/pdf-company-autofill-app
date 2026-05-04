@@ -32,27 +32,17 @@ function getTrimmed(fieldName) {
   return el ? String(el.value || "").trim() : "";
 }
 
-function formatCoopDate(raw) {
+/** Chosen coop date as dd/mm/yyyy (numeric only, no month names). */
+function formatCoopDateDdMmYyyy(raw) {
   if (!raw) return "";
   const d = new Date(`${raw}T12:00:00`);
   if (Number.isNaN(d.getTime())) return raw;
-  return d.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
 }
 
-/** For [ Month / Date ] style: e.g. May/4/2026 from the date picker */
-function formatMonthSlashDate(raw) {
-  if (!raw) return "";
-  const d = new Date(`${raw}T12:00:00`);
-  if (Number.isNaN(d.getTime())) return raw;
-  const month = d.toLocaleString(undefined, { month: "long" });
-  const day = d.getDate();
-  const year = d.getFullYear();
-  return `${month}/${day}/${year}`;
-}
 
 function normalizeBracketInner(inner) {
   return String(inner)
@@ -101,9 +91,9 @@ function valueForCanonicalKey(key, companyName) {
     case "weeks":
       return getTrimmed("weeks");
     case "date":
-      return formatCoopDate(getTrimmed("coopDate"));
+      return formatCoopDateDdMmYyyy(getTrimmed("coopDate"));
     case "monthdate":
-      return formatMonthSlashDate(getTrimmed("coopDate"));
+      return formatCoopDateDdMmYyyy(getTrimmed("coopDate"));
     case "company":
       return companyName;
     default:

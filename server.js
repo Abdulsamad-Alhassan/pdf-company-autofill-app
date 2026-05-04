@@ -43,6 +43,24 @@ function parseNumber(value, fallback) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function formatDisplayDate(isoDate) {
+  const raw = String(isoDate || "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    return raw;
+  }
+  const [y, m, d] = raw.split("-").map((part) => Number(part));
+  const date = new Date(Date.UTC(y, m - 1, d));
+  if (Number.isNaN(date.getTime())) {
+    return raw;
+  }
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 function normalizeCellValue(value) {
   if (value === undefined || value === null) {
     return "";
@@ -151,6 +169,10 @@ async function buildPdfForCompany({
   companyNameAr,
   userName,
   userId,
+  major,
+  university,
+  weeksLabel,
+  dateLabel,
   companyEnX,
   companyEnY,
   companyArX,
@@ -161,6 +183,9 @@ async function buildPdfForCompany({
   idY,
   pageNumber,
   fontSize,
+  extraFieldsBelowId,
+  extraFieldsLineStep,
+  fieldEraseWidth,
 }) {
   const pdfDoc = await PDFDocument.load(templateBuffer);
   const pages = pdfDoc.getPages();
@@ -186,10 +211,39 @@ async function buildPdfForCompany({
     });
   };
 
+  const eraseLine = (x, y) => {
+    const bandHeight = fontSize + 8;
+    page.drawRectangle({
+      x: x - 2,
+      y: y - 5,
+      width: fieldEraseWidth,
+      height: bandHeight,
+      color: rgb(1, 1, 1),
+    });
+  };
+
   drawText(companyNameEn, companyEnX, companyEnY);
   drawText(companyNameAr, companyArX, companyArY, "right");
   drawText(userName, nameX, nameY);
   drawText(userId, idX, idY);
+
+  const baseX = nameX;
+  const lines = [
+    { text: major },
+    { text: university },
+    { text: weeksLabel },
+    { text: dateLabel },
+  ];
+
+  lines.forEach((line, index) => {
+    const y = idY - extraFieldsBelowId - index * extraFieldsLineStep;
+    const t = String(line.text || "").trim();
+    if (!t) {
+      return;
+    }
+    eraseLine(baseX, y);
+    drawText(t, baseX, y);
+  });
 
   return pdfDoc.save();
 }
@@ -211,10 +265,24 @@ app.post(
 
       const userName = String(req.body.userName || "").trim();
       const userId = String(req.body.userId || "").trim();
+      const major = String(req.body.major || "").trim();
+      const university = String(req.body.university || "").trim();
+      const weeksRaw = String(req.body.weeks || "").trim();
+      const coopDate = String(req.body.coopDate || "").trim();
 
       if (!userName || !userId) {
         return res.status(400).json({ error: "User name and ID are required." });
       }
+      if (!major || !university || !weeksRaw || !coopDate) {
+        return res.status(400).json({ error: "Major, university, number of weeks, and date are required." });
+      }
+
+      const weeksNum = parseNumber(weeksRaw, NaN);
+      if (!Number.isFinite(weeksNum) || weeksNum < 1) {
+        return res.status(400).json({ error: "Number of weeks must be a positive number." });
+      }
+      const weeksLabel = `${Math.round(weeksNum)} weeks`;
+      const dateLabel = formatDisplayDate(coopDate);
 
       const legacyCompanyX = parseNumber(req.body.companyX, 100);
       const legacyCompanyY = parseNumber(req.body.companyY, 500);
@@ -228,6 +296,9 @@ app.post(
       const idY = parseNumber(req.body.idY, 440);
       const fontSize = parseNumber(req.body.fontSize, 12);
       const pageNumber = parseNumber(req.body.pageNumber, 1);
+      const extraFieldsBelowId = parseNumber(req.body.extraFieldsBelowId, 38);
+      const extraFieldsLineStep = parseNumber(req.body.extraFieldsLineStep, 28);
+      const fieldEraseWidth = parseNumber(req.body.fieldEraseWidth, 420);
 
       const companies = parseCompaniesFromExcel(excelFile.path);
       if (companies.length === 0) {
@@ -247,6 +318,10 @@ app.post(
           companyNameAr: company.companyNameAr,
           userName,
           userId,
+          major,
+          university,
+          weeksLabel,
+          dateLabel,
           companyEnX,
           companyEnY,
           companyArX,
@@ -257,6 +332,9 @@ app.post(
           idY,
           pageNumber,
           fontSize,
+          extraFieldsBelowId,
+          extraFieldsLineStep,
+          fieldEraseWidth,
         });
 
         const safeCompany = sanitizeForFileName(company.companyNameEn || company.companyNameAr);

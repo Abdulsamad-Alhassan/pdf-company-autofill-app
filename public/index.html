@@ -13,7 +13,9 @@
         Upload your Excel + PDF template, then click one company button to download only that PDF.
       </p>
       <p class="subtitle">
-        Defaults are tuned for: General letter COOP 2026- IAU.pdf
+        Defaults are tuned for: General letter COOP 2026- IAU.pdf. Major, university, weeks, and date are drawn on
+        the same page under your ID (white band first) so template blanks like <code>[]</code> on those lines are
+        covered.
       </p>
 
       <form id="processForm" class="card">
@@ -25,6 +27,26 @@
         <label>
           Your ID
           <input type="text" name="userId" required />
+        </label>
+
+        <label>
+          Major
+          <input type="text" name="major" required />
+        </label>
+
+        <label>
+          University
+          <input type="text" name="university" required />
+        </label>
+
+        <label>
+          Number of weeks
+          <input type="number" name="weeks" min="1" step="1" required />
+        </label>
+
+        <label>
+          Date
+          <input type="date" name="coopDate" required />
         </label>
 
         <label>
@@ -48,6 +70,9 @@
           <label>ID Y <input type="number" name="idY" value="440" required /></label>
           <label>Page Number <input type="number" name="pageNumber" value="1" min="1" required /></label>
           <label>Font Size <input type="number" name="fontSize" value="12" min="1" required /></label>
+          <label>Gap below ID (pts) <input type="number" name="extraFieldsBelowId" value="38" min="0" required /></label>
+          <label>Extra field line step <input type="number" name="extraFieldsLineStep" value="28" min="1" required /></label>
+          <label>Erase band width <input type="number" name="fieldEraseWidth" value="420" min="50" required /></label>
         </div>
 
         <button id="submitButton" type="submit">Generate Company PDFs</button>
@@ -59,6 +84,33 @@
           Tap any company name to download only that company PDF.
         </p>
         <div id="companyButtons" class="button-list"></div>
+
+        <div class="letter-dual">
+          <div class="letter-col">
+            <h3 class="letter-section-title">Your text</h3>
+            <p class="subtitle letter-hint">
+              Type your letter here. Use placeholders such as <code>[name]</code>, <code>[id]</code>,
+              <code>[major]</code>, <code>[university]</code>, <code>[weeks]</code>, <code>[date]</code>,
+              and <code>[company]</code> or a single other <code>[…]</code> for the company name.
+            </p>
+            <textarea
+              id="letterTemplate"
+              class="letter-textarea"
+              rows="14"
+              placeholder="Example: Dear [company], I am [name] ([id])…"
+            ></textarea>
+          </div>
+          <div class="letter-col">
+            <h3 class="letter-section-title">With replacements</h3>
+            <p class="subtitle letter-hint">
+              Click a company button below. This box updates with your form values and that company filled in; your
+              original text above is not changed.
+            </p>
+            <textarea id="letterOutput" class="letter-textarea letter-output" rows="14" readonly></textarea>
+          </div>
+        </div>
+        <p class="subtitle letter-preview-label">Pick a company for the letter preview (download is still the row above)</p>
+        <div id="letterCompanyButtons" class="button-list letter-preview-buttons"></div>
       </section>
 
       <p id="status"></p>

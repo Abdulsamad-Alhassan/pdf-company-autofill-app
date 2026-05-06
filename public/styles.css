@@ -51,6 +51,86 @@ input {
   gap: 10px;
 }
 
+/* ── Settings panel ── */
+.settings-panel {
+  margin-top: 8px;
+  margin-bottom: 4px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f9fafb;
+}
+
+.settings-panel[open] {
+  background: #fff;
+  border-color: #cbd5e1;
+}
+
+.settings-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.settings-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.settings-toggle:hover {
+  background: #f0f1f3;
+}
+
+.settings-icon {
+  font-size: 16px;
+}
+
+.settings-arrow {
+  margin-left: auto;
+  font-size: 13px;
+  transition: transform 0.2s ease;
+}
+
+.settings-panel[open] .settings-arrow {
+  transform: rotate(90deg);
+}
+
+.settings-body {
+  padding: 4px 16px 16px;
+}
+
+.settings-hint {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.settings-group {
+  padding: 12px 0 6px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.settings-group:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.settings-group-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6366f1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 button {
   border: none;
   border-radius: 8px;

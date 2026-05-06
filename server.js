@@ -1,9 +1,10 @@
-  const express = require("express");
+const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const multer = require("multer");
 const XLSX = require("xlsx");
+const pdfParse = require("pdf-parse");
 const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
 
 const app = express();
@@ -163,6 +164,32 @@ function parseCompaniesFromExcel(filePath) {
   return hasHeader ? rowValues.slice(1) : rowValues;
 }
 
+async function parseCompaniesFromPdf(filePath) {
+  const dataBuffer = fs.readFileSync(filePath);
+  const pdfData = await pdfParse(dataBuffer);
+  const text = pdfData.text || "";
+
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
+  return lines.map((line) => {
+    const isArabic = /[\u0600-\u06FF]/.test(line);
+    return {
+      companyNameEn: isArabic ? "" : line,
+      companyNameAr: isArabic ? line : "",
+    };
+  }).map((entry) => ({
+    companyNameEn: entry.companyNameEn || entry.companyNameAr,
+    companyNameAr: entry.companyNameAr || entry.companyNameEn,
+  }));
+}
+
+function getFileExtension(filename) {
+  return path.extname(filename || "").toLowerCase();
+}
+
 async function buildPdfForCompany({
   templateBuffer,
   companyNameEn,
@@ -251,16 +278,16 @@ async function buildPdfForCompany({
 app.post(
   "/api/process",
   upload.fields([
-    { name: "excelFile", maxCount: 1 },
+    { name: "companyFile", maxCount: 1 },
     { name: "pdfTemplate", maxCount: 1 },
   ]),
   async (req, res) => {
     try {
-      const excelFile = req.files?.excelFile?.[0];
+      const companyFile = req.files?.companyFile?.[0];
       const pdfTemplate = req.files?.pdfTemplate?.[0];
 
-      if (!excelFile || !pdfTemplate) {
-        return res.status(400).json({ error: "Excel file and PDF template are required." });
+      if (!companyFile || !pdfTemplate) {
+        return res.status(400).json({ error: "Company file (Excel or PDF) and PDF template are required." });
       }
 
       const userName = String(req.body.userName || "").trim();
@@ -300,9 +327,15 @@ app.post(
       const extraFieldsLineStep = parseNumber(req.body.extraFieldsLineStep, 28);
       const fieldEraseWidth = parseNumber(req.body.fieldEraseWidth, 420);
 
-      const companies = parseCompaniesFromExcel(excelFile.path);
+      const ext = getFileExtension(companyFile.originalname);
+      let companies;
+      if (ext === ".pdf") {
+        companies = await parseCompaniesFromPdf(companyFile.path);
+      } else {
+        companies = parseCompaniesFromExcel(companyFile.path);
+      }
       if (companies.length === 0) {
-        return res.status(400).json({ error: "No company names found in the Excel file (English or Arabic columns)." });
+        return res.status(400).json({ error: "No company names found in the uploaded file (English or Arabic)." });
       }
 
       const templateBuffer = fs.readFileSync(pdfTemplate.path);

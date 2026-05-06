@@ -1,140 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PDF Company Autofill</title>
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <main class="container">
-      <h1>PDF Company Autofill</h1>
-      <p class="subtitle">
-        Upload your Excel + PDF template, then click one company button to download only that PDF.
-      </p>
-      <p class="subtitle">
-        Defaults are tuned for: General letter COOP 2026- IAU.pdf. Major, university, weeks, and date are drawn on
-        the same page under your ID (white band first) so template blanks like <code>[]</code> on those lines are
-        covered.
-      </p>
 
-      <form id="processForm" class="card">
-        <label>
-          Your Name
-          <input type="text" name="userName" required />
-        </label>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Company Autofill</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
 
-        <label>
-          Your ID
-          <input type="text" name="userId" required />
-        </label>
+<body>
+  <main class="container">
+    <h1>PDF Company Autofill</h1>
+    <p class="subtitle">
+      Upload your Excel + PDF template, then click one company button to download only that PDF.
+    </p>
+    <p class="subtitle">
+      Defaults are tuned for: General letter COOP 2026- IAU.pdf. Major, university, weeks, and date are drawn on
+      the same page under your ID (white band first) so template blanks like <code>[]</code> on those lines are
+      covered.
+    </p>
 
-        <label>
-          Major
-          <input type="text" name="major" required />
-        </label>
+    <form id="processForm" class="card">
+      <label>
+        Your Name
+        <input type="text" name="userName" required />
+      </label>
 
-        <label>
-          University
-          <input type="text" name="university" required />
-        </label>
+      <label>
+        Your ID
+        <input type="text" name="userId" required />
+      </label>
 
-        <label>
-          Number of weeks
-          <input type="number" name="weeks" min="1" step="1" required />
-        </label>
+      <label>
+        Major
+        <input type="text" name="major" required />
+      </label>
 
-        <label>
-          Date
-          <input type="date" name="coopDate" required />
-        </label>
+      <label>
+        University
+        <input type="text" name="university" required />
+      </label>
 
-        <label>
-          Excel File (company names in English/Arabic columns)
-          <input type="file" name="excelFile" accept=".xlsx,.xls" required />
-        </label>
+      <label>
+        Number of weeks
+        <input type="number" name="weeks" min="1" step="1" required />
+      </label>
 
-        <label>
-          PDF Template
-          <input type="file" name="pdfTemplate" accept=".pdf" required />
-        </label>
+      <label>
+        Date
+        <input type="date" name="coopDate" required />
+      </label>
 
-        <div class="grid">
-          <label>Company EN X <input type="number" name="companyEnX" value="130" required /></label>
-          <label>Company EN Y <input type="number" name="companyEnY" value="706" required /></label>
-          <label>Company AR X <input type="number" name="companyArX" value="520" required /></label>
-          <label>Company AR Y <input type="number" name="companyArY" value="640" required /></label>
-          <label>Name X <input type="number" name="nameX" value="100" required /></label>
-          <label>Name Y <input type="number" name="nameY" value="470" required /></label>
-          <label>ID X <input type="number" name="idX" value="100" required /></label>
-          <label>ID Y <input type="number" name="idY" value="440" required /></label>
-          <label>Page Number <input type="number" name="pageNumber" value="1" min="1" required /></label>
-          <label>Font Size <input type="number" name="fontSize" value="12" min="1" required /></label>
-          <label>Gap below ID (pts) <input type="number" name="extraFieldsBelowId" value="38" min="0" required /></label>
-          <label>Extra field line step <input type="number" name="extraFieldsLineStep" value="28" min="1" required /></label>
-          <label>Erase band width <input type="number" name="fieldEraseWidth" value="420" min="50" required /></label>
-        </div>
+      <label>
+        Company Names File (Excel or PDF)
+        <input type="file" name="companyFile" accept=".xlsx,.xls,.pdf" required />
+      </label>
 
-        <button id="submitButton" type="submit">Generate Company PDFs</button>
-      </form>
+      <label>
+        PDF Template
+        <input type="file" name="pdfTemplate" accept=".pdf" required />
+      </label>
 
-      <section id="results" class="card hidden">
-        <h2>Companies</h2>
-        <p class="subtitle">
-          Tap any company name to download only that company PDF.
-        </p>
-        <div id="companyButtons" class="button-list"></div>
-
-        <div class="letter-dual">
-          <div class="letter-col">
-            <h3 class="letter-section-title">Your text</h3>
-            <p class="subtitle letter-hint">
-              Spacing inside brackets is optional. Examples:
-              <code>[ Name ]</code>, <code>[ Id ]</code>, <code>[ Major ]</code>, <code>[ University ]</code>,
-              <code>[ Weeks ]</code> or <code>[ Number ]</code> (weeks), <code>[ Date ]</code> and
-              <code>[ Month/Date ]</code> (chosen date as <code>dd/mm/yyyy</code>, e.g. 28/06/2026),
-              <code>[ Company ]</code> or
-              <code>[ Company Name ]</code>. Casing does not matter. Any other single <code>[ … ]</code> left is
-              filled with the company you pick below.
-            </p>
-            <textarea
-              id="letterTemplate"
-              class="letter-textarea"
-              rows="14"
-              placeholder="Example: Dear [ Company Name ], [ Number ] weeks from [ Month/Date ]…"
-            ></textarea>
+      <details class="settings-panel">
+        <summary class="settings-toggle">
+          <span class="settings-icon">⚙</span> Advanced Settings
+          <span class="settings-arrow">▸</span>
+        </summary>
+        <div class="settings-body">
+          <p class="settings-hint">PDF coordinate positions and layout options. Defaults are tuned for the standard COOP
+            template.</p>
+          <div class="settings-group">
+            <h4 class="settings-group-title">Company Name Position</h4>
+            <div class="grid">
+              <label>EN X <input type="number" name="companyEnX" value="130" required /></label>
+              <label>EN Y <input type="number" name="companyEnY" value="706" required /></label>
+              <label>AR X <input type="number" name="companyArX" value="520" required /></label>
+              <label>AR Y <input type="number" name="companyArY" value="640" required /></label>
+            </div>
           </div>
-          <div class="letter-col">
-            <h3 class="letter-section-title">With replacements</h3>
-            <p class="subtitle letter-hint">
-              Click a company button below. This box updates with your form values and that company filled in; your
-              original text above is not changed.
-            </p>
-            <textarea id="letterOutput" class="letter-textarea letter-output" rows="14" readonly></textarea>
+          <div class="settings-group">
+            <h4 class="settings-group-title">User Info Position</h4>
+            <div class="grid">
+              <label>Name X <input type="number" name="nameX" value="100" required /></label>
+              <label>Name Y <input type="number" name="nameY" value="470" required /></label>
+              <label>ID X <input type="number" name="idX" value="100" required /></label>
+              <label>ID Y <input type="number" name="idY" value="440" required /></label>
+            </div>
+          </div>
+          <div class="settings-group">
+            <h4 class="settings-group-title">Layout</h4>
+            <div class="grid">
+              <label>Page Number <input type="number" name="pageNumber" value="1" min="1" required /></label>
+              <label>Font Size <input type="number" name="fontSize" value="12" min="1" required /></label>
+              <label>Gap below ID (pts) <input type="number" name="extraFieldsBelowId" value="38" min="0"
+                  required /></label>
+              <label>Line step <input type="number" name="extraFieldsLineStep" value="28" min="1" required /></label>
+              <label>Erase band width <input type="number" name="fieldEraseWidth" value="420" min="50"
+                  required /></label>
+            </div>
           </div>
         </div>
-        <div class="custom-company-box">
-          <label class="custom-company-label">
-            Other company (not in the list)
-            <input
-              type="text"
-              id="customCompanyInput"
-              class="custom-company-input"
-              placeholder="Type a company name, then press Change"
-              autocomplete="off"
-            />
-          </label>
-          <button type="button" id="customCompanyChange" class="custom-company-button">
-            Change
-          </button>
+      </details>
+
+      <button id="submitButton" type="submit">Generate Company PDFs</button>
+    </form>
+
+    <section id="results" class="card hidden">
+      <h2>Companies</h2>
+      <p class="subtitle">
+        Tap any company name to download only that company PDF.
+      </p>
+      <div id="companyButtons" class="button-list"></div>
+
+      <div class="letter-dual">
+        <div class="letter-col">
+          <h3 class="letter-section-title">Your text</h3>
+          <p class="subtitle letter-hint">
+            Spacing inside brackets is optional. Examples:
+            <code>[ Name ]</code>, <code>[ Id ]</code>, <code>[ Major ]</code>, <code>[ University ]</code>,
+            <code>[ Weeks ]</code> or <code>[ Number ]</code> (weeks), <code>[ Date ]</code> and
+            <code>[ Month/Date ]</code> (chosen date as <code>dd/mm/yyyy</code>, e.g. 28/06/2026),
+            <code>[ Company ]</code> or
+            <code>[ Company Name ]</code>. Casing does not matter. Any other single <code>[ … ]</code> left is
+            filled with the company you pick below.
+          </p>
+          <textarea id="letterTemplate" class="letter-textarea" rows="14"
+            placeholder="Example: Dear [ Company Name ], [ Number ] weeks from [ Month/Date ]…"></textarea>
         </div>
-        <p class="subtitle letter-preview-label">Pick a company for the letter preview (download is still the row above)</p>
-        <div id="letterCompanyButtons" class="button-list letter-preview-buttons"></div>
-      </section>
+        <div class="letter-col">
+          <h3 class="letter-section-title">With replacements</h3>
+          <p class="subtitle letter-hint">
+            Click a company button below. This box updates with your form values and that company filled in; your
+            original text above is not changed.
+          </p>
+          <textarea id="letterOutput" class="letter-textarea letter-output" rows="14" readonly></textarea>
+        </div>
+      </div>
+      <div class="custom-company-box">
+        <label class="custom-company-label">
+          Other company (not in the list)
+          <input type="text" id="customCompanyInput" class="custom-company-input"
+            placeholder="Type a company name, then press Change" autocomplete="off" />
+        </label>
+        <button type="button" id="customCompanyChange" class="custom-company-button">
+          Change
+        </button>
+      </div>
+      <p class="subtitle letter-preview-label">Pick a company for the letter preview (download is still the row above)
+      </p>
+      <div id="letterCompanyButtons" class="button-list letter-preview-buttons"></div>
+    </section>
 
-      <p id="status"></p>
-    </main>
+    <p id="status"></p>
+  </main>
 
-    <script src="./app.js"></script>
-  </body>
+  <script src="./app.js"></script>
+</body>
+
 </html>
